@@ -16,15 +16,14 @@ import { CommonController } from './common.controller';
 @Module({
   imports: [
     MulterModule.register({
-      // limits: {
-      //   fileSize: 1000000000,
-      // },
       storage: multer.diskStorage({
         destination: (req, file, cb) => {
           cb(null, TEMP_PATH);
         },
         filename: (req, file, cb) => {
-          cb(null, `${uuidv4()}${extname(file.originalname)}`);
+          const fileName = Buffer.from(file.originalname, 'latin1').toString('utf8');
+          const uniqueFileName = `${uuidv4()}${extname(fileName)}`;
+          cb(null, uniqueFileName);
         },
       }),
       fileFilter: (req, file, cb) => {

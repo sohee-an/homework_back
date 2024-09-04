@@ -26,8 +26,8 @@ export class User {
   @Column()
   password: string;
 
-  // @Column({ type: 'enum', enum: UserRole, default: UserRole.Normal })
-  // role: UserRole;
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.Normal })
+  role: UserRole;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

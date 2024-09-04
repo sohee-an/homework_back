@@ -9,14 +9,7 @@ import { User } from 'src/user/entity/user.entity';
 import { PostImagesService } from './images.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([AssignmentModel, ImageModel, User]),
-    CommonModule,
-
-    // MulterModule.register({
-    //   limits: { fileSize: 10 * 1024 * 1024 },
-    // }),
-  ],
+  imports: [TypeOrmModule.forFeature([AssignmentModel, ImageModel, User]), CommonModule],
   controllers: [AssignmentController],
   providers: [AssignmentService, PostImagesService],
 })
