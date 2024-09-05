@@ -11,10 +11,11 @@ import { AssignmentModule } from './assignment/assignment.module';
 import postgresConfig from './config/postgres.config';
 import jwtConfig from './config/jwt.config';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { PUBLIC_FOLDER_NAME } from './common/const/path.const';
+import { PUBLIC_FOLDER_NAME, PUBLIC_FOLDER_PATH } from './common/const/path.const';
 import { CommonModule } from './common/common.module';
 import { LogMiddleware } from 'src/common/middleware/log.middleware';
 import { Logger } from '@nestjs/common';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { Logger } from '@nestjs/common';
       isGlobal: true,
       load: [postgresConfig, jwtConfig],
     }),
+
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {

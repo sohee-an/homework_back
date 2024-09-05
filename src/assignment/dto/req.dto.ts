@@ -1,11 +1,21 @@
 import { PickType } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsOptional, IsString, ValidateNested } from 'class-validator';
 import { AssignmentModel } from 'src/assignment/entity/assignment.entity';
 
-export class CreatePostDto extends PickType(AssignmentModel, ['dayNumber', 'description', 'title']) {
-  @IsString({
-    each: true,
-  })
+class ImageDto {
+  @IsString()
+  fileName: string;
+
+  @IsString()
+  fileOriginName: string;
+}
+export class CreatePostDto extends PickType(AssignmentModel, ['description']) {
+  // @IsString({
+  //   each: true,
+  // })
+  @ValidateNested({ each: true })
+  @Type(() => ImageDto)
   @IsOptional()
-  images?: string[] = [];
+  images?: ImageDto[] = [];
 }

@@ -42,6 +42,10 @@ export class ImageModel extends BaseModel {
   })
   path: string;
 
-  @ManyToOne(() => AssignmentModel, (assignment) => assignment.images)
-  assignment?: AssignmentModel;
+  @Column()
+  @IsString()
+  originName: string;
+
+  @ManyToOne(() => AssignmentModel, (assignment) => assignment.images, { nullable: false })
+  assignment: AssignmentModel;
 }

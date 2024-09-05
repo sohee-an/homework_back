@@ -1,10 +1,10 @@
-import { Body, Controller, InternalServerErrorException, Post, UseFilters, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Res, UseFilters, UseInterceptors } from '@nestjs/common';
 import { AssignmentService } from './assignment.service';
 import { CreatePostDto } from './dto/req.dto';
 import { User } from 'src/common/decorator/user.decorator';
 import { ImageModelType } from './entity/image.entity';
 import { DataSource, QueryRunner as QR } from 'typeorm';
-import { PostImagesService } from './images.service';
+import { ImagesService } from './images.service';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
 import { QueryRunner } from 'src/common/decorator/query-runner.decortor';
 import { HttpExceptionFilter } from 'src/common/exception-filter/http.exception-filter';
@@ -14,8 +14,13 @@ export class AssignmentController {
   constructor(
     private readonly assignmentService: AssignmentService,
     private readonly dataSource: DataSource,
-    private readonly postsImagesService: PostImagesService,
+    private readonly postsImagesService: ImagesService,
   ) {}
+
+  @Get()
+  async getAssignment() {
+    return await this.assignmentService.getAssignments();
+  }
 
   @Post()
   @UseInterceptors(TransactionInterceptor)
@@ -24,14 +29,27 @@ export class AssignmentController {
     const assignment = await this.assignmentService.createAssignment(userId, body);
 
     for (let i = 0; i < body.images.length; i++) {
+      const image = body.images[i];
       await this.postsImagesService.createPostImges({
         assignment,
         order: i,
-
-        path: body.images[i],
+        originName: image.fileOriginName,
+        path: image.fileName,
         type: ImageModelType.ASSIGNMENT_IMAGE,
       });
-      return this.assignmentService.getAssignmentById(assignment.id, qr);
     }
+    return this.assignmentService.getAssignmentById(assignment.id, qr);
+  }
+
+  @Get(':assignmentId')
+  async getDetailAssignment(@Param('assignmentId') assignmentId: string) {
+    return this.assignmentService.getAssignmentById(assignmentId);
+  }
+
+  @Put(':assignmentId')
+  async putAssignment(@User('id') userId: string, @Param('assignmentId') assignmentId: string, @Body() body: any) {
+    console.log('body', body);
+    const findAssignment = this.assignmentService.updateAssignment(assignmentId, userId, body);
+    return findAssignment;
   }
 }

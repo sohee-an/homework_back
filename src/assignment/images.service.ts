@@ -8,7 +8,7 @@ import { ASSIGNMENT_PATH, TEMP_PATH } from 'src/common/const/path.const';
 import { promises } from 'fs';
 
 @Injectable()
-export class PostImagesService {
+export class ImagesService {
   constructor(
     @InjectRepository(ImageModel)
     private readonly imageRepository: Repository<ImageModel>,
@@ -35,10 +35,9 @@ export class PostImagesService {
     const result = await respository.save({
       ...dto,
     });
+
     // 파일 옮기기
     await promises.rename(tempFilePath, newPath);
     return result;
   }
-    
-    
 }

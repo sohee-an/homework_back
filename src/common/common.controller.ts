@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CommonService } from './common.service';
-import { TEMP_PATH } from './const/path.const';
+import { ASSIGNMENT_PATH, TEMP_PATH } from './const/path.const';
 import { join } from 'path';
 import { promises as fs } from 'fs';
+import { Response } from 'express';
 
 @Controller('common')
 export class CommonController {
@@ -15,7 +16,7 @@ export class CommonController {
     const originalFileName = Buffer.from(file.originalname, 'latin1').toString('utf8'); // UTF-8로 변환된 파일 이름
     const storedFileName = file.filename;
     return {
-      originalName: originalFileName,
+      originName: originalFileName,
       fileName: storedFileName,
       fileSize: file.size,
     };
@@ -23,9 +24,7 @@ export class CommonController {
 
   @Delete('image')
   async deleteImage(@Query('imageId') imageId: string) {
-    console.log('imageId', imageId);
-
-    const filePath = join(TEMP_PATH, imageId); // 파일 경로 생성
+    const filePath = join(TEMP_PATH, imageId);
 
     try {
       await fs.unlink(filePath);
@@ -36,5 +35,17 @@ export class CommonController {
       console.error('Error deleting file:', error);
       throw new Error('파일업로드에 실패했습니다.');
     }
+  }
+
+  @Get('download/:fileName')
+  async downloadFile(@Param('fileName') fileName: string, @Res() res: Response) {
+    const filePath = join(ASSIGNMENT_PATH, fileName);
+
+    res.download(filePath, fileName, (err) => {
+      if (err) {
+        console.error('Error downloading file:', err);
+        res.status(500).send('Could not download the file');
+      }
+    });
   }
 }

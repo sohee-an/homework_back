@@ -7,11 +7,11 @@ export class AssignmentModel {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  dayNumber: number;
+  // @Column()
+  // dayNumber: number;
 
-  @Column()
-  title: string;
+  // @Column()
+  // title: string;
 
   @Column()
   description: string;
