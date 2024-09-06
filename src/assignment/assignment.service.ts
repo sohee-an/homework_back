@@ -8,7 +8,7 @@ import { CommonService } from 'src/common/common.service';
 import { ConfigService } from '@nestjs/config';
 import { CreatePostDto } from './dto/req.dto';
 import { DEFAULT_POST_FIND_OPTIONS } from './const/default-post-find-options.const';
-import { TEMP_PATH, PUBLIC_FOLDER_PATH, ASSIGNMENT_PATH } from 'src/common/const/path.const';
+import {  ASSIGNMENT_PATH } from 'src/common/const/path.const';
 import { join } from 'path';
 import { promises } from 'fs';
 import { CreatePostImageDto } from './image/dto/req.dto';

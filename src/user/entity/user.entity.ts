@@ -11,6 +11,7 @@ import {
 import { UserRole } from '../enum/user.enum';
 import { RefreshToken } from 'src/auth/entity/refresh-token';
 import { AssignmentModel } from 'src/assignment/entity/assignment.entity';
+import { AssignmentGroupModel } from 'src/assignment-group/entity/assignment-group.entity';
 
 @Entity()
 export class User {
@@ -41,8 +42,8 @@ export class User {
   @OneToMany(() => Video, (video) => video.user)
   videos: Video[];
 
-  @OneToMany(() => AssignmentModel, (assignment) => assignment.upload)
-  uploadedAssignments: AssignmentModel[];
+  @OneToMany(() => AssignmentGroupModel, (assignment) => assignment.upload)
+  uploadedAssignments: AssignmentGroupModel[];
 
   // @OneToMany(() => AssignmentModel, (assignment) => assignment.subscribe)
   // assignments: AssignmentModel[];
