@@ -17,16 +17,31 @@ export class AssignmentController {
     private readonly postsImagesService: ImagesService,
   ) {}
 
-  @Get()
-  async getAssignment() {
-    return await this.assignmentService.getAssignments();
+  // @Get(':assignmentGroupId')
+  // async getAssignment(@Prams) {
+  //   return await this.assignmentService.getAssignments();
+  // }
+  @Get('group/:assignmentGroupId')
+  async getAssignmentsByGroup(@Param('assignmentGroupId') assignmentGroupId: string) {
+    return await this.assignmentService.getAssignmentsByGroup(assignmentGroupId);
   }
 
-  @Post()
+  @Get(':assignmentId')
+  async getDetailAssignment(@Param('assignmentId') assignmentId: string) {
+    console.log('aaa', assignmentId);
+    return this.assignmentService.getAssignmentById(assignmentId);
+  }
+
+  @Post(':assignmentGroupId')
   @UseInterceptors(TransactionInterceptor)
   @UseFilters(HttpExceptionFilter)
-  async postAssignment(@User('id') userId: string, @Body() body: CreatePostDto, @QueryRunner() qr: QR) {
-    const assignment = await this.assignmentService.createAssignment(userId, body);
+  async postAssignment(
+    @User('id') userId: string,
+    @Param('assignmentGroupId') assignmentGroupId: string,
+    @Body() body: CreatePostDto,
+    @QueryRunner() qr: QR,
+  ) {
+    const assignment = await this.assignmentService.createAssignment(userId, body, assignmentGroupId);
 
     for (let i = 0; i < body.images.length; i++) {
       const image = body.images[i];
@@ -39,11 +54,6 @@ export class AssignmentController {
       });
     }
     return this.assignmentService.getAssignmentById(assignment.id, qr);
-  }
-
-  @Get(':assignmentId')
-  async getDetailAssignment(@Param('assignmentId') assignmentId: string) {
-    return this.assignmentService.getAssignmentById(assignmentId);
   }
 
   @Put(':assignmentId')

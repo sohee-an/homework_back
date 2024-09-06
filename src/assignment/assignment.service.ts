@@ -8,17 +8,20 @@ import { CommonService } from 'src/common/common.service';
 import { ConfigService } from '@nestjs/config';
 import { CreatePostDto } from './dto/req.dto';
 import { DEFAULT_POST_FIND_OPTIONS } from './const/default-post-find-options.const';
-import {  ASSIGNMENT_PATH } from 'src/common/const/path.const';
+import { ASSIGNMENT_PATH } from 'src/common/const/path.const';
 import { join } from 'path';
 import { promises } from 'fs';
 import { CreatePostImageDto } from './image/dto/req.dto';
 import { ImagesService } from './images.service';
+import { AssignmentGroupModel } from 'src/assignment-group/entity/assignment-group.entity';
 
 @Injectable()
 export class AssignmentService {
   constructor(
     @InjectRepository(AssignmentModel) private assignmentRepository: Repository<AssignmentModel>,
     @InjectRepository(ImageModel) private readonly imageRepository: Repository<ImageModel>,
+    @InjectRepository(AssignmentGroupModel)
+    private readonly assignmentGroupRepository: Repository<AssignmentGroupModel>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly imagesService: ImagesService,
     private readonly commonService: CommonService,
@@ -29,32 +32,42 @@ export class AssignmentService {
     return qr ? qr.manager.getRepository<AssignmentModel>(AssignmentModel) : this.assignmentRepository;
   }
 
-  async createAssignment(userId: string, body: CreatePostDto, qr?: QueryRunner) {
+  async createAssignment(userId: string, body: CreatePostDto, assignmentGroupId: string, qr?: QueryRunner) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
+    // assignmentGroupId로 AssignmentGroupModel 조회
+    const assignmentGroup = await this.assignmentGroupRepository.findOne({ where: { id: assignmentGroupId } });
+    if (!assignmentGroup) {
+      throw new NotFoundException(`Assignment Group with ID ${assignmentGroupId} not found`);
+    }
+
     const { description } = body;
     const repository = this.getRepository(qr);
 
     const post = repository.create({
-      // dayNumber,
-      // title,
       description,
       images: [],
       upload: user,
+      assignmentSet: assignmentGroup, // assignmentGroup과 연결
     });
 
     return await repository.save(post);
   }
 
-  async getAssignments() {
-    const allAssignment = await this.assignmentRepository.find({
+  async getAssignmentsByGroup(assignmentGroupId: string) {
+    const assignments = await this.assignmentRepository.find({
+      where: {
+        assignmentSet: {
+          id: assignmentGroupId,
+        },
+      },
       ...DEFAULT_POST_FIND_OPTIONS,
     });
-    return allAssignment;
+    return assignments;
   }
 
   async getAssignmentById(assignmentId: string, qr?: QueryRunner) {
@@ -64,6 +77,8 @@ export class AssignmentService {
       where: { id: assignmentId },
       ...DEFAULT_POST_FIND_OPTIONS, // 필요에 따라 연관된 엔티티를 함께 로드
     });
+
+    console.log('asssi', assignment);
 
     if (!assignment) {
       throw new NotFoundException(`Assignment with ID ${assignmentId} not found`);
@@ -76,7 +91,7 @@ export class AssignmentService {
     const repository = this.getRepository(qr);
     const assignment = await this.assignmentRepository.findOne({
       where: { id: assignmentId },
-      ...DEFAULT_POST_FIND_OPTIONS,
+      relations: ['upload', 'images', 'assignmentSet'],
     });
 
     if (!assignment) {
