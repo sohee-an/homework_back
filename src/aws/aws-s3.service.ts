@@ -87,11 +87,11 @@ export class AwsS3Service {
       if (!fileExists) {
         throw new BadRequestException(`${tempFileKey} 파일이 없습니다.`);
       }
-      console.log('!!!!!!!!!!!!!');
+
       const newKey = tempFileKey.replace('temp/', 'images/');
-      console.log('newkey', newKey);
+
       const encodedCopySource = encodeURIComponent(`${this.S3_BUCKET_NAME}/${tempFileKey}`);
-      console.log('CopySource:', encodedCopySource);
+
       // 2. temp에서 images로 파일 복사
       const copyCommand = new CopyObjectCommand({
         Bucket: this.S3_BUCKET_NAME,
@@ -140,21 +140,19 @@ export class AwsS3Service {
 
       const data: GetObjectCommandOutput = await this.s3Client.send(command);
 
-      // Check if file is found on S3
       if (!data.Body) {
         throw new BadRequestException('File not found in S3');
       }
 
-      // Pipe the S3 file stream to the response
       const passThrough = new PassThrough();
       (data.Body as any).pipe(passThrough);
 
-      // Set the headers for the response
+      // header 설정
       const encodedFileName = encodeURIComponent(fileKey);
-res.set({
-  'Content-Type': data.ContentType,
-  'Content-Disposition': `attachment; filename*=UTF-8''${encodedFileName}`, // 인코딩된 파일 이름 사용
-});
+      res.set({
+        'Content-Type': data.ContentType,
+        'Content-Disposition': `attachment; filename*=UTF-8''${encodedFileName}`,
+      });
 
       passThrough.pipe(res);
     } catch (error) {
