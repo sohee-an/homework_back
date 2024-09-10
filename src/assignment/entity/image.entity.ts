@@ -1,10 +1,8 @@
 import { Transform } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
-import { join } from 'path';
-import { ASSIGNMENT_PATH } from 'src/common/const/path.const';
-import { BaseModel } from 'src/common/entity/baseModel.entity';
 import { Column, ManyToOne, Entity } from 'typeorm';
 import { AssignmentModel } from './assignment.entity';
+import { BaseModel } from 'src/common/entity/baseModel.entity';
 
 export enum ImageModelType {
   ASSIGNMENT_IMAGE,
@@ -18,9 +16,6 @@ export class ImageModel extends BaseModel {
   @IsOptional()
   order: number;
 
-  // @Column()
-  // mimetype: string;
-
   @Column({
     type: 'enum',
     enum: ImageModelType,
@@ -31,11 +26,12 @@ export class ImageModel extends BaseModel {
   @Column()
   @IsString()
   @Transform(({ value, obj }) => {
+    const S3_BASE_URL = 'https://homework-back-nestjs.s3.ap-northeast-2.amazonaws.com/'; // S3 버킷 URL
+
     if (obj.type === ImageModelType.ASSIGNMENT_IMAGE) {
-      return join(ASSIGNMENT_PATH, value); // ASSIGNMENT_PATH와 경로를 결합
+      return `${S3_BASE_URL}${value}`; // S3 버킷 URL과 파일 경로를 결합
     } else if (obj.type === ImageModelType.PROFILE_IMAGE) {
-      return value;
-      // return join(PROFILE_PATH, value); // PROFILE_PATH와 경로를 결합
+      return `${S3_BASE_URL}${value}`; // 프로필 이미지도 S3 버킷 URL과 경로 결합
     } else {
       return value;
     }

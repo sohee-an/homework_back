@@ -17,6 +17,7 @@ import { LogMiddleware } from 'src/common/middleware/log.middleware';
 import { Logger } from '@nestjs/common';
 import { join } from 'path';
 import { AssignmentGroupModule } from './assignment-group/assignment-group.module';
+import { AwsModule } from './aws/aws.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { AssignmentGroupModule } from './assignment-group/assignment-group.modul
     AuthModule,
     CommonModule,
     AssignmentModule,
+    AwsModule,
     ServeStaticModule.forRoot({
       rootPath: PUBLIC_FOLDER_NAME,
       serveRoot: '/public',

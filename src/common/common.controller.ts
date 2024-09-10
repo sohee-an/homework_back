@@ -5,35 +5,46 @@ import { ASSIGNMENT_PATH, TEMP_PATH } from './const/path.const';
 import { join } from 'path';
 import { promises as fs } from 'fs';
 import { Response } from 'express';
+import { AwsS3Service } from 'src/aws/aws-s3.service';
 
 @Controller('common')
 export class CommonController {
-  constructor(private readonly commonService: CommonService) {}
+  constructor(private readonly commonService: CommonService, private readonly awsS3Service: AwsS3Service) {}
 
   @Post('image')
   @UseInterceptors(FileInterceptor('image'))
-  postImage(@UploadedFile() file: Express.Multer.File) {
-    const originalFileName = Buffer.from(file.originalname, 'latin1').toString('utf8'); // UTF-8로 변환된 파일 이름
-    const storedFileName = file.filename;
+  async uploadFileToTemp(@UploadedFile() file: Express.Multer.File) {
+    const folder = 'temp'; // temp 폴더 지정
+    const result = await this.awsS3Service.uploadFileToS3(folder, file);
+
+    // 파일의 원본 이름을 UTF-8로 변환
+    const originalFileName = Buffer.from(file.originalname, 'latin1').toString('utf8');
+    const storedFileName = result.key;
+    const fileSize = file.size;
+
     return {
-      originName: originalFileName,
-      fileName: storedFileName,
-      fileSize: file.size,
+      originName: originalFileName, // UTF-8로 변환된 원본 이름
+      fileName: storedFileName, // S3에 저장된 파일의 Key
+      fileSize: fileSize, // 파일 크기
+      message: 'File uploaded to temp folder',
     };
   }
 
   @Delete('image')
   async deleteImage(@Query('imageId') imageId: string) {
-    const filePath = join(TEMP_PATH, imageId);
+    const filePath = `${imageId}`; // S3 temp 폴더 아래에서 imageId에 해당하는 파일 경로 설정
 
+    console.log('ddd', filePath);
     try {
-      await fs.unlink(filePath);
+      // S3에서 파일 삭제
+      await this.awsS3Service.deleteS3Object(filePath);
       return {
         imageId: imageId,
+        message: 'File deleted successfully from S3',
       };
     } catch (error) {
-      console.error('Error deleting file:', error);
-      throw new Error('파일업로드에 실패했습니다.');
+      console.error('Error deleting file from S3:', error);
+      throw new Error('S3에서 파일 삭제에 실패했습니다.');
     }
   }
 
