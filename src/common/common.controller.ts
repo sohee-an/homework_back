@@ -50,13 +50,22 @@ export class CommonController {
 
   @Get('download/:fileName')
   async downloadFile(@Param('fileName') fileName: string, @Res() res: Response) {
-    const filePath = join(ASSIGNMENT_PATH, fileName);
+    try {
+      const decodedFileName = decodeURIComponent(fileName);
+    console.log('Decoded file name:', decodedFileName);
 
-    res.download(filePath, fileName, (err) => {
-      if (err) {
-        console.error('Error downloading file:', err);
-        res.status(500).send('Could not download the file');
-      }
-    });
+      await this.awsS3Service.downloadFileFromS3(`images/${decodedFileName}`, res);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      res.status(400).send('Could not download the file');
+    }
+    // const filePath = join(ASSIGNMENT_PATH, fileName);
+
+    // res.download(filePath, fileName, (err) => {
+    //   if (err) {
+    //     console.error('Error downloading file:', err);
+    //     res.status(500).send('Could not download the file');
+    //   }
+    // });
   }
 }

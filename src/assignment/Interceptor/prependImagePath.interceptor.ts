@@ -3,25 +3,31 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Injectable()
-export class PrependImagePathInterceptor implements NestInterceptor {
+export class PrependS3UrlInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const S3_BASE_URL = 'https://homework-back-nestjs.s3.ap-northeast-2.amazonaws.com/';
+
     return next.handle().pipe(
       map((data) => {
-        const S3_BASE_URL = 'https://homework-back-nestjs.s3.ap-northeast-2.amazonaws.com/';
-
-        // 응답 데이터에 path가 있을 경우에만 수정
-        if (data && data.path) {
-          data.path = `${S3_BASE_URL}${data.path}`;
-        }
-
-        // 만약 응답이 배열일 경우 각각 처리
+        // data가 배열일 때
         if (Array.isArray(data)) {
-          data = data.map((item) => {
-            if (item.path) {
-              item.path = `${S3_BASE_URL}${item.path}`;
+          return data.map((item) => {
+            if (item.images) {
+              item.images = item.images.map((img) => ({
+                ...img,
+                path: `${S3_BASE_URL}${img.path}`,
+              }));
             }
             return item;
           });
+        }
+
+        // data가 객체일 때
+        if (data.images) {
+          data.images = data.images.map((img) => ({
+            ...img,
+            path: `${S3_BASE_URL}${img.path}`,
+          }));
         }
 
         return data;

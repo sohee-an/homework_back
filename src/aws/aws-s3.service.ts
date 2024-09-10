@@ -7,10 +7,12 @@ import {
   DeleteObjectCommand,
   HeadObjectCommand,
   PutObjectCommandOutput,
+  GetObjectCommand,
+  GetObjectCommandOutput,
 } from '@aws-sdk/client-s3';
 import { basename } from 'path';
-import { Express } from 'express';
-import { v4 as uuidv4 } from 'uuid';
+import { PassThrough } from 'stream';
+import { Response } from 'express';
 
 @Injectable()
 export class AwsS3Service {
@@ -42,7 +44,7 @@ export class AwsS3Service {
       const key = `${folder}/${Date.now()}_${basename(originalFileName)}`.replace(/ /g, '');
       // const extension = file.originalname.split('.').pop(); // 파일 확장자 추출
       // const key = `${folder}/${Date.now()}_${uuidv4()}.${extension}`.replace(/ /g, '');
-      console.log('file', file);
+
       const command = new PutObjectCommand({
         Bucket: this.S3_BUCKET_NAME,
         Key: key,
@@ -85,10 +87,11 @@ export class AwsS3Service {
       if (!fileExists) {
         throw new BadRequestException(`${tempFileKey} 파일이 없습니다.`);
       }
-
+      console.log('!!!!!!!!!!!!!');
       const newKey = tempFileKey.replace('temp/', 'images/');
+      console.log('newkey', newKey);
       const encodedCopySource = encodeURIComponent(`${this.S3_BUCKET_NAME}/${tempFileKey}`);
-      //
+      console.log('CopySource:', encodedCopySource);
       // 2. temp에서 images로 파일 복사
       const copyCommand = new CopyObjectCommand({
         Bucket: this.S3_BUCKET_NAME,
@@ -104,7 +107,7 @@ export class AwsS3Service {
         Key: tempFileKey,
       });
 
-      await this.s3Client.send(deleteCommand);
+      // await this.s3Client.send(deleteCommand);
 
       return { newKey };
     } catch (error) {
@@ -125,6 +128,37 @@ export class AwsS3Service {
       return { success: true };
     } catch (error) {
       throw new BadRequestException(`Failed to delete file: ${error.message}`);
+    }
+  }
+
+  async downloadFileFromS3(fileKey: string, res: Response): Promise<void> {
+    try {
+      const command = new GetObjectCommand({
+        Bucket: this.S3_BUCKET_NAME,
+        Key: fileKey,
+      });
+
+      const data: GetObjectCommandOutput = await this.s3Client.send(command);
+
+      // Check if file is found on S3
+      if (!data.Body) {
+        throw new BadRequestException('File not found in S3');
+      }
+
+      // Pipe the S3 file stream to the response
+      const passThrough = new PassThrough();
+      (data.Body as any).pipe(passThrough);
+
+      // Set the headers for the response
+      const encodedFileName = encodeURIComponent(fileKey);
+res.set({
+  'Content-Type': data.ContentType,
+  'Content-Disposition': `attachment; filename*=UTF-8''${encodedFileName}`, // 인코딩된 파일 이름 사용
+});
+
+      passThrough.pipe(res);
+    } catch (error) {
+      throw new BadRequestException(`Failed to download file: ${error.message}`);
     }
   }
 

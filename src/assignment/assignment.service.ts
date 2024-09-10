@@ -182,6 +182,7 @@ export class AssignmentService {
     // 6. 추가할 이미지 처리 (body.images에 있고 기존에는 없던 이미지)
     const newImages = body.images.filter((image) => !existingImagePaths.includes(image.fileName));
 
+    console.log("new",newImages)
     for (let i = 0; i < newImages.length; i++) {
       const image = newImages[i];
 
