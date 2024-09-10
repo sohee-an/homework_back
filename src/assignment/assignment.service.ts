@@ -182,12 +182,13 @@ export class AssignmentService {
     // 6. 추가할 이미지 처리 (body.images에 있고 기존에는 없던 이미지)
     const newImages = body.images.filter((image) => !existingImagePaths.includes(image.fileName));
 
-    console.log("new",newImages)
+    console.log('new', newImages);
     for (let i = 0; i < newImages.length; i++) {
       const image = newImages[i];
 
       // S3에서 temp 폴더에서 images 폴더로 파일 이동
       const tempFileKey = `${image.fileName}`;
+
       const movedFile = await this.awsS3Service.moveFileInS3(tempFileKey);
 
       // 7. 이미지 정보 저장 (DB에 이동된 S3 경로로 저장)

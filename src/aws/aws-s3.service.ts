@@ -77,9 +77,13 @@ export class AwsS3Service {
       throw new BadRequestException(`Failed to check file existence: ${error.message}`);
     }
   }
-
-  // temp에서 images로 파일 이동하는 로직
   async moveFileInS3(tempFileKey: string): Promise<{ newKey: string }> {
+    // temp/로 시작하지 않으면 바로 리턴
+    if (!tempFileKey.startsWith('temp/')) {
+      console.log('File is already in images or not in temp, skipping move:', tempFileKey);
+      return { newKey: tempFileKey }; // 이미 images/에 있는 파일일 경우, 이동을 스킵하고 해당 파일 경로를 반환
+    }
+
     try {
       // 1. temp 폴더에 파일이 존재하는지 확인
       const fileExists = await this.checkFileExists(tempFileKey);
@@ -107,7 +111,7 @@ export class AwsS3Service {
         Key: tempFileKey,
       });
 
-      // await this.s3Client.send(deleteCommand);
+      await this.s3Client.send(deleteCommand);
 
       return { newKey };
     } catch (error) {
