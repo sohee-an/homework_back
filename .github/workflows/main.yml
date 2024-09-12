@@ -59,7 +59,7 @@ jobs:
   deploy:
     needs: build
     name: Deploy
-    runs-on: [self-hosted, Linux, x64]
+    runs-on: [self-hosted, linux, x64]
 
     steps:
       - name: Login to ghcr
