@@ -8,7 +8,7 @@ on:
 env:
   DOCKER_IMAGE: ghcr.io/${{ github.actor }}/homework_back
   VERSION: ${{ github.sha }}
-  NAME: ci-cd_homework_back
+  NAME: cicd_test
 
 jobs:
   build:
