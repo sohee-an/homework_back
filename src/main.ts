@@ -42,7 +42,7 @@ async function bootstrap() {
     }),
   );
 
-  const port = process.env.PORT || 8070;
+  const port = process.env.PORT || 8080;
   await app.listen(port);
   Logger.log(`STAGE: ${configService.get('STAGE')}`);
   Logger.log(`listening on port ${port}`);
