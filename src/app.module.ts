@@ -15,9 +15,9 @@ import { PUBLIC_FOLDER_NAME, PUBLIC_FOLDER_PATH } from './common/const/path.cons
 import { CommonModule } from './common/common.module';
 import { LogMiddleware } from 'src/common/middleware/log.middleware';
 import { Logger } from '@nestjs/common';
-import { join } from 'path';
 import { AssignmentGroupModule } from './assignment-group/assignment-group.module';
 import { AwsModule } from './aws/aws.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -39,7 +39,7 @@ import { AwsModule } from './aws/aws.module';
           autoLoadEntities: true,
         };
         // 주의! development 환경에서만 개발 편의성을 위해 활용
-        if (configService.get('NODE_ENV') === 'development') {
+        if (configService.get('STAGE') === 'development') {
           console.info('Sync TypeORM');
           obj = Object.assign(obj, {
             synchronize: true,
@@ -53,6 +53,7 @@ import { AwsModule } from './aws/aws.module';
     AnalyticsModule,
     UserModule,
     AuthModule,
+
     CommonModule,
     AssignmentModule,
     AwsModule,
@@ -62,6 +63,7 @@ import { AwsModule } from './aws/aws.module';
     }),
     AssignmentGroupModule,
   ],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_GUARD,

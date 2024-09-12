@@ -3,7 +3,7 @@ import * as winstonDaily from 'winston-daily-rotate-file';
 import * as winston from 'winston';
 import * as moment from 'moment-timezone';
 
-const env = process.env.NODE_ENV;
+const env = process.env.STAGE;
 
 const appendTimestamp = winston.format((info, opts) => {
   if (opts.tz) {
