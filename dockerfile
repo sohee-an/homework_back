@@ -8,7 +8,7 @@ RUN npm uninstall bcrypt
 RUN npm install bcrypt
 RUN npm install
 RUN npm run build
-RUN npm install -g pm2 
+
 
 
 ARG JWT_SECRET
