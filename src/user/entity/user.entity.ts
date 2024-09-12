@@ -10,11 +10,11 @@ import {
 } from 'typeorm';
 import { UserRole } from '../enum/user.enum';
 import { RefreshToken } from 'src/auth/entity/refresh-token';
-import { AssignmentModel } from 'src/assignment/entity/assignment.entity';
 import { AssignmentGroupModel } from 'src/assignment-group/entity/assignment-group.entity';
+import { BaseModel } from 'src/common/entity/baseModel.entity';
 
 @Entity()
-export class User {
+export class User extends BaseModel {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -30,11 +30,11 @@ export class User {
   @Column({ type: 'enum', enum: UserRole, default: UserRole.Normal })
   role: UserRole;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  // @CreateDateColumn({ name: 'created_at' })
+  // createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  // @UpdateDateColumn({ name: 'updated_at' })
+  // updatedAt: Date;
 
   @OneToOne(() => RefreshToken, (refreshToken) => refreshToken.user)
   refreshToken: RefreshToken;

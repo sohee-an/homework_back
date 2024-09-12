@@ -66,6 +66,9 @@ export class AssignmentService {
           id: assignmentGroupId,
         },
       },
+      order: {
+        createdAt: 'DESC', // createdAt을 기준으로 내림차순 정렬
+      },
       ...DEFAULT_POST_FIND_OPTIONS,
     });
 

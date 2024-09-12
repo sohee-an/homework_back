@@ -2,9 +2,10 @@ import { Entity, ManyToOne, PrimaryGeneratedColumn, Column, JoinColumn, OneToMan
 import { User } from 'src/user/entity/user.entity';
 import { ImageModel } from './image.entity';
 import { AssignmentGroupModel } from 'src/assignment-group/entity/assignment-group.entity';
+import { BaseModel } from 'src/common/entity/baseModel.entity';
 
 @Entity()
-export class AssignmentModel {
+export class AssignmentModel extends BaseModel {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

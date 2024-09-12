@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
-import { Column, ManyToOne, Entity } from 'typeorm';
+import { Column, ManyToOne, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { AssignmentModel } from './assignment.entity';
 import { BaseModel } from 'src/common/entity/baseModel.entity';
 
@@ -11,6 +11,9 @@ export enum ImageModelType {
 
 @Entity()
 export class ImageModel extends BaseModel {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
   @Column({ default: 0 })
   @IsInt()
   @IsOptional()
