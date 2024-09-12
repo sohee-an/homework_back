@@ -28,13 +28,15 @@ export class AuthController {
   async signin(
     @Body() { email, password }: SigninReqDto,
     @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
   ): Promise<SigninResDto> {
     const { accessToken, refreshToken } = await this.authService.signin(email, password);
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
+      // secure: process.env.NODE_ENV === 'production',
       secure: false,
-      // sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
