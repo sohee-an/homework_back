@@ -50,7 +50,7 @@ jobs:
           context: .
           build-args: |
             STAGE=${{ secrets.STAGE }}
-            POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
+            POSTGRES_HOST=postgres
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             AWS_S3_ACCESS_KEY=${{ secrets.AWS_S3_ACCESS_KEY }}
             AWS_S3_SECRET_KEY=${{ secrets.AWS_S3_SECRET_KEY }}
