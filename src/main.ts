@@ -41,10 +41,12 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  const dbPort = configService.get<number>('POSTGRES_PORT') || 5432;
 
   const port = process.env.PORT || 8080;
   await app.listen(port);
   Logger.log(`STAGE: ${configService.get('STAGE')}`);
   Logger.log(`listening on port ${port}`);
+  Logger.log(`Database is connecting on port: ${dbPort}`);
 }
 bootstrap();
