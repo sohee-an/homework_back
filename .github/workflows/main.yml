@@ -70,9 +70,9 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Docker Compose Up
-          run: |
-            sudo docker-compose down || true
-            sudo docker-compose up -d
+        run: |
+          sudo docker-compose down || true
+          sudo docker-compose up -d
       # - name: Docker run
       #   run: |
       #     sudo docker stop ${{ env.NAME }} || true && sudo docker rm ${{ env.NAME }} || true && sudo docker rmi ${{ env.DOCKER_IMAGE }}:latest || true
