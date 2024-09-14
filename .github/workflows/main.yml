@@ -69,7 +69,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Docker run
-        run: |
-          sudo docker stop ${{ env.NAME }} || true && sudo docker rm ${{ env.NAME }} || true && sudo docker rmi ${{ env.DOCKER_IMAGE }}:latest || true
-          sudo docker run --add-host=host.docker.internal:host-gateway -d -p 80:3000 --name ${{ env.NAME }} --restart always ${{ env.DOCKER_IMAGE }}:latest
+       - name: Docker Compose Up
+          run: |
+            sudo docker-compose down || true
+            sudo docker-compose up -d
+      # - name: Docker run
+      #   run: |
+      #     sudo docker stop ${{ env.NAME }} || true && sudo docker rm ${{ env.NAME }} || true && sudo docker rmi ${{ env.DOCKER_IMAGE }}:latest || true
+      #     sudo docker run --add-host=host.docker.internal:host-gateway -d -p 80:3000 --name ${{ env.NAME }} --restart always ${{ env.DOCKER_IMAGE }}:latest

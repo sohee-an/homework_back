@@ -1,20 +1,80 @@
-volumes:
-  postgres_data:
-
+version: '3'
 services:
   postgres:
     image: postgres:14.7
     container_name: postgres
-    # 5432로 포워딩 할 경우 host os 에 설치된 postgre와 겹칠 수 있으므로 host에 설치된 postgre를 내려야함
     ports:
-      - '8000:5432'
+      - '5434:5432'
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
     restart: always
+
+  app:
+    image: ghcr.io/${{ github.actor }}/homework_back
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - '80:3000'
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+# volumes:
+#   postgres_data:
+
+# services:
+#   postgres:
+#     image: postgres:14.7
+#     container_name: postgres
+#     ports:
+#       - '5434:5432'
+#     environment:
+#       - POSTGRES_USER=postgres
+#       - POSTGRES_PASSWORD=postgres
+#       - POSTGRES_DB=postgres
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+#     restart: always
+#     networks:
+#       - app-network # 새 네트워크 추가
+
+# networks:
+#   app-network: # 네트워크 정의
+#     driver: bridge
+# volumes:
+#   postgres_data:
+
+# services:
+#   postgres:
+#     image: postgres:14.7
+#     container_name: postgres
+#     # 5432로 포워딩 할 경우 host os 에 설치된 postgre와 겹칠 수 있으므로 host에 설치된 postgre를 내려야함
+#     ports:
+#       - '5434:5432'
+#     environment:
+#       - POSTGRES_USER=postgres
+#       - POSTGRES_PASSWORD=postgres
+#       - POSTGRES_DB=postgres
+
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+#     restart: always
 # networks:
 #   my_network:
 #     driver: bridge
