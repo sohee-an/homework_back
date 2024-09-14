@@ -31,8 +31,7 @@ import { AppController } from './app.controller';
       useFactory: async (configService: ConfigService) => {
         let obj: TypeOrmModuleOptions = {
           type: 'postgres',
-          host: '8000',
-          // host: configService.get('postgres.host'),
+          host: configService.get('postgres.host'),
           port: configService.get('postgres.port'),
           database: configService.get('postgres.database'),
           username: configService.get('postgres.username'),
